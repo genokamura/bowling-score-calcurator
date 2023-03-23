@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './App.css';
 import { Bowling } from './bowling';
+import BowlingScoreboard from './BowlingScoreboard';
 
 const App: React.FC = () => {
   const [bowling, setBowling] = useState(new Bowling());
@@ -60,60 +61,10 @@ const App: React.FC = () => {
     }
   };
 
-  const renderFrames = () => {
-    const frameScores = bowling.frameScores();
-    const frames = [];
-    let rollIndex = 0;
-    let totalScore = 0;
-    console.log('rolls', rolls);
-    console.log('framescores', frameScores);
-  
-    for (let i = 0; i < 10; i++) {
-      const isStrike = bowling.isStrike(rollIndex);
-      const isSpare = !isStrike && bowling.isSpare(rollIndex);
-  
-      console.log(rolls[rollIndex]);
-      const roll1 = isStrike ? "X" : rolls[rollIndex] === undefined ? "" : rolls[rollIndex] || "-";
-      let roll2 = isStrike ? "" : isSpare ? "/" : rolls[rollIndex + 1]  === undefined ? "" : rolls[rollIndex + 1] || "-";
-  
-      // 最終フレームの処理
-      let roll3 = "";
-      if (i === 9) {
-        roll2 = bowling.isStrike(rollIndex + 1) ? "X" : isSpare ? "/" : rolls[rollIndex + 1]  === undefined ? "" : rolls[rollIndex + 1] || "-";
-        if (isStrike || isSpare) {
-          roll3 = bowling.isStrike(rollIndex + 2) ? "X" : bowling.isStrike(rollIndex + 1) && bowling.isSpare(rollIndex + 2) ? "/" : rolls[rollIndex + 2]  === undefined ? "" : rolls[rollIndex + 2].toString() || "-";
-        }
-        rollIndex += 2;
-      } else {
-        rollIndex += isStrike ? 1 : 2;
-      }
-
-      // フレームごとのスコアの合計を計算
-      totalScore += frameScores[i] !== undefined ? frameScores[i] : 0;
-      totalScore = isNaN(totalScore) ? 0 : totalScore;
-  
-      frames.push(
-        <div key={i} className={`frame ${i === 9 ? 'last-frame' : ''}`}>
-          <div className="frame-header">Frame {i + 1}</div>
-          <div className="frame-rolls">
-            <div className="roll-box">{roll1}</div>
-            <div className="roll-box">{roll2}</div>
-            {i === 9 && <div className="roll-box">{roll3}</div>}
-          </div>
-          <div className="frame-score">
-            {totalScore === 0 ? '' : totalScore.toString()}
-          </div>
-        </div>
-      );
-    }
-  
-    return frames;
-  };
-
   return (
     <div className="App">
       <h1>Bowling Scoreboard</h1>
-      <div className="frames">{renderFrames()}</div>
+      <BowlingScoreboard bowling={bowling} rolls={rolls} />
       <form onSubmit={onSubmit}>
         <input ref={pinsInput} type="number" min="0" max="10" placeholder="Pins" />
         <button type="submit">Roll</button>
